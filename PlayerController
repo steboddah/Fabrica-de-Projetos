@@ -1,0 +1,106 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+public class PlayerController : MonoBehaviour
+{
+    private Rigidbody2D playerRb;
+    private int bombas;
+    public int tempofase;
+    public Text bombaTxt, tempoTxt;
+    private Animator playAnimator;
+    public float MovementSpeed = 1;
+
+
+    void Start()
+    {
+        playerRb = GetComponent<Rigidbody2D>();
+        StartCoroutine("contagemRegressiva");
+        playAnimator = GetComponent<Animator>();
+        StartCoroutine("Anima");
+        playAnimator.SetBool("exp", false);
+       
+
+    }
+  void  Update()
+    {
+
+        var movement = Input.GetAxis("Horizontal");
+
+        transform.position += new Vector3(movement, 0, 0) * Time.deltaTime * MovementSpeed;
+
+    }
+
+    // Update is called once per frame
+
+    IEnumerator contagemRegressiva()
+    {
+        tempoTxt.text = tempofase.ToString();
+        yield return new WaitForSeconds(1);
+
+        tempofase -= 1;
+
+        if (tempofase > 0)
+        {
+            StartCoroutine("contagemRegressiva");
+        }
+        else
+        {
+            SceneManager.LoadScene("jogo2s");
+        } if (tempofase == 11)
+        {
+            StartCoroutine("Chamacena");
+        }
+
+    }
+    void OnTriggerEnter2D(Collider2D col)
+    {
+        if (col.tag == "bomba")
+        {
+            bombas += 1;
+            bombaTxt.text = bombas.ToString();
+
+            playAnimator.SetBool("exp", true);
+           
+            playAnimator.SetBool("voar", true);
+            StartCoroutine("Anima");
+
+        }
+        if (bombas == 5)
+       {
+
+            StartCoroutine("GameOver");
+
+
+
+        }
+       
+       
+      
+ 
+       
+    }
+    IEnumerator GameOver()
+    {
+        yield return new WaitForSeconds(1);
+        SceneManager.LoadScene("GameOver");
+    }
+    IEnumerator Chamacena()
+    {
+        yield return new WaitForSeconds(2);
+        SceneManager.LoadScene("jogo2s 1");
+    }
+    IEnumerator Anim()
+    {
+        yield return new WaitForSeconds(1);
+
+        SceneManager.LoadScene("jogo2s");
+    }
+    IEnumerator Anima()
+    {
+        yield return new WaitForSeconds(2);
+        playAnimator.SetBool("voar", false);
+
+    }
+}
