@@ -1,0 +1,37 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+
+public class preferencias : MonoBehaviour
+{
+     public InputField IFnome;
+     public Toggle tgSom;
+    public Slider SlVolume;
+
+
+ 
+    public void SavePrefs()
+    {
+        PlayerPrefs.SetString("Nome", IFnome.text);
+        PlayerPrefs.SetString("Som", tgSom.isOn.ToString());
+        PlayerPrefs.SetFloat("Volume", SlVolume.value);
+ 
+
+    }
+    public void LoadPrefs()
+    {
+        IFnome.text = PlayerPrefs.GetString("Nome","Jogador");
+        tgSom.isOn = bool.Parse(PlayerPrefs.GetString("Som", true.ToString()));
+        SlVolume.value = PlayerPrefs.GetFloat("Volume", 0.5f);
+        StartCoroutine("Anim");
+
+    }
+    IEnumerator Anim()
+    {
+        yield return new WaitForSeconds(2);
+
+        SceneManager.LoadScene("f3");
+    }
+} 
