@@ -1,0 +1,83 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class playec2 : MonoBehaviour
+
+{
+
+	Animator animator;
+	float axis;
+	Vector2 velocidade;
+	bool ladoDireito = true;
+	bool noChao = false;
+	float chaoCheckRaio = 0.2f;
+
+	public float MaxVelocidade = 10;
+
+	public Transform ChaoCheck;
+	public LayerMask OQueEChao;
+	private Animator playAnimator;
+
+	// Use this for initialization
+	void Start()
+	{
+		animator = GetComponent<Animator>();
+		playAnimator = GetComponent<Animator>();
+	}
+
+	void FixedUpdate()
+	{
+		noChao = Physics2D.OverlapCircle(ChaoCheck.position, chaoCheckRaio, OQueEChao);
+
+		axis = Input.GetAxis("Horizontal");
+
+		if (axis > 0 && !ladoDireito)
+			Vire();
+		if (axis < 0 && ladoDireito)
+			Vire();
+
+		velocidade = new Vector2(axis * MaxVelocidade, GetComponent<Rigidbody2D>().velocity.y);
+
+		animator.SetFloat("Velocidade", Mathf.Abs(axis));
+
+		GetComponent<Rigidbody2D>().velocity = velocidade;
+
+	}
+
+	// Update is called once per frame
+	void Update()
+	{
+		if (noChao && Input.GetButton("Jump"))
+		{
+			GetComponent<Rigidbody2D>().AddForce(new Vector2(0, 30));
+		}
+	}
+
+	void Vire()
+	{
+		ladoDireito = !ladoDireito;
+
+		Vector2 novoScale = new Vector2(transform.localScale.x * -1, transform.localScale.y);
+
+		transform.localScale = novoScale;
+	}
+	void OnTriggerEnter2D(Collider2D col)
+	{
+		if (col.tag == "bomba")
+		{
+
+
+
+			playAnimator.SetBool("voar", true);
+			StartCoroutine("Anima");
+
+		}
+	}
+	IEnumerator Anima()
+	{
+		yield return new WaitForSeconds(2);
+		playAnimator.SetBool("voar", false);
+
+	}
+}
